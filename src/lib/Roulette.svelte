@@ -1,48 +1,10 @@
 <script>
   import BetButton from './BetButton.svelte'
+  import {generateBetNumbers} from '../utils'
 
+  export let randomNumberGenerator = () => parseInt(Math.random()*37)
   /* it generates the number bets () */
-  let rows = Array.from({length:12},(_,i)=>i+1)
-    .map((v,i)=>{
-      let arr = Array.from({length:3},(_,x)=>x+1)
-        return arr.reduce((acc,val)=>{
-          const id = val+3*i
-          if((id-1)%3===0){
-            acc.push({
-              id: `${id}-${val+1+3*i}-${val+2+3*i}`,
-              text: `${id}-${val+1+3*i}-${val+2+3*i}`,
-              type: i%2===0?'street':'street'
-            })
-          }
-          acc.push({
-            id,
-            text: id,
-            type:'straight'
-          })
-          if(id<3*(i+1)){
-            acc.push({
-              id: `${id}-${val+1+3*i}`,
-              text: `${id}-${val+1+3*i}`,
-              type: 'split'
-            })
-          }
-          return acc
-        },[])
-      })
-    .reduce((acc,val,i,arr)=>{
-      acc.push(val)
-      if(arr[i+1]){
-        acc.push(
-          val.map((v,j)=>({
-            id: `${v.id}-${arr[i+1][j].id}`,
-            text: `${v.id}-${arr[i+1][j].id}`,
-            type: j===0?'six-line':j%2===0?'corner':'split'
-          }))
-        )
-      }
-      return acc
-    },[])
-
+  let rows = generateBetNumbers()
   const multipliers = {
     straight: 35,
     split: 15,
@@ -62,6 +24,7 @@
   let keepStats = false
   let logs = []
   let bets = {}
+  let lastGain = 0
   $: lostBets = logs.filter(v=>v.earn===0).length
   $: maxWin = logs.reduce((a,v)=>v.diffEarn>a ? v.diffEarn : a,0)
   $: totalBet = Object.values(bets).reduce((acc,val)=>val.bet+acc,0);
@@ -104,7 +67,7 @@
   }
   
   const calculation = ()=>{
-    rouletteNumber = '00'//parseInt(Math.random()*37)
+    rouletteNumber = randomNumberGenerator()
     if(rouletteNumber===37){
       rouletteNumber = '00'
     }
@@ -127,6 +90,7 @@
       }
     },0)
     balance+=earn
+    lastGain=earn-totalBet
     logs = [...logs, {rouletteNumber, earn, diffEarn: earn-totalBet}]
   }
 
@@ -152,23 +116,27 @@
   ]
   const dozenCols = ['1_dozen_col','2_dozen_col','3_dozen_col']
 </script>
-<div class="roulette max-w-[500px]">
+<div class="roulette max-w-[500px]s grid grid-cols-[1fr_1fr] gap-5">
   <div class="flex flex-col">
-    <label>Balance:</label>
-    <input class="text-center mb-2" type="text" bind:value={balance}>
-    <label>Cycles:</label>
-    <input class="text-center mb-2" type="text" bind:value={cycles}>
+    <div class="mb-2 flex flex-col" title="Simulates the money">
+      <label>Balance:</label>
+      <input class="text-center mb-2" type="text" bind:value={balance}>
+    </div>
+    <div class="mb-2 flex flex-col" title="How many times play automatically">
+      <label >Cycles:</label>
+      <input class="text-center" type="text" bind:value={cycles}>
+    </div>
     <label>Coin:</label>
     <select class="text-center mb-2" bind:value={coinSelected}>
-      <option value={1}>1</option>
-      <option value={2}>2</option>
-      <option value={5}>5</option>
-      <option value={10}>10</option>
-      <option value={20}>20</option>
-      <option value={50}>50</option>
-      <option value={100}>100</option>
+      <option value={1}>1 coins</option>
+      <option value={2}>2 coins</option>
+      <option value={5}>5 coins</option>
+      <option value={10}>10 coins</option>
+      <option value={20}>20 coins</option>
+      <option value={50}>50 coins</option>
+      <option value={100}>100 coins</option>
     </select>
-    <div class="flex items-center justify-center gap-2 mb-2">
+    <div class="flex items-center justify-center gap-2 mb-2" title="If checked, after each play it will remain the previous stats">
       <label for="keep-stats">Keep stats:</label>
       <input id="keep-stats" type="checkbox" bind:checked={keepStats}>
     </div>
@@ -178,8 +146,9 @@
     <button on:click={handleCalculate}>
       Start
     </button>
-    <span class="mb-2 mt-5 font-bold bg-green-500">Total bet: {totalBet}</span>
-    <span class="mb-10 mt-5 font-bold bg-red-500">Last number: {rouletteNumber}</span>
+    <span class="mt-5 font-bold bg-blue-500">Total bet: {totalBet}</span>
+    <span class="mb-5 mt-5 font-bold bg-red-500">Last number: {rouletteNumber}</span>
+    <span class="mb-10 font-bold bg-green-500">Last gain: {lastGain}</span>
   </div>
   <div class="grid grid-cols-[100px_auto]  mb-10">
     <div class='mt-[50px] mb-[50px] gap-[10px] flex flex-col justify-evenly items-center'>
@@ -375,11 +344,10 @@
   {/if}
 </div>
 
-<style global>
+<style >
 button {
   color:black;
   background-color:white;
   border-radius:0;
 }
-
 </style>

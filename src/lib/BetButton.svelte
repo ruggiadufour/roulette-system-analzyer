@@ -11,7 +11,6 @@
   const handleAddBet = (id)=> dispatch('handleAddBet',{id,text,type})
   const handleSubstractBet = (id)=> dispatch('handleSubstractBet',{id,text,type})
 
-
   const handleMouseOver = () => {
     style = document.createElement('style');
     style.type = 'text/css';
@@ -37,6 +36,7 @@
 {:else if betweens.includes(type)}
   <div 
     class="relative w-full min-h-[10px] cursor-pointer"
+    data-testid={id}
     on:click={()=>handleAddBet(id)}
     on:contextmenu|preventDefault={()=>handleSubstractBet(id)}
     on:mouseover={handleMouseOver}
@@ -53,6 +53,7 @@
 {:else}
   <button 
     class={`bet-number relative cursor-pointer w-[40px] h-[40px] ${classColor} text-black flex items-center justify-center ${clazz || ''} text-${color!=='white'?'white':'black'} id-${type==='number'?`number-${id}`:id}`}
+    data-testid={id}
     on:click={()=>handleAddBet(id)}
     on:contextmenu|preventDefault={()=>handleSubstractBet(id)}
   >
