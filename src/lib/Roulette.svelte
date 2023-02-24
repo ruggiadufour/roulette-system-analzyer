@@ -2,7 +2,7 @@
   import BetButton from './BetButton.svelte'
   import {generateBetNumbers} from '../utils'
 
-  export let randomNumberGenerator = () => parseInt(Math.random()*37)
+  export let randomNumberGenerator = () => parseInt(Math.random()*37)+1
   /* it generates the number bets () */
   let rows = generateBetNumbers()
   const multipliers = {
@@ -120,14 +120,14 @@
   <div class="flex flex-col">
     <div class="mb-2 flex flex-col" title="Simulates the money">
       <label>Balance:</label>
-      <input class="text-center mb-2" type="text" bind:value={balance}>
+      <input class="text-center mb-2" placeholder="Balance" type="text" bind:value={balance}>
     </div>
     <div class="mb-2 flex flex-col" title="How many times play automatically">
       <label >Cycles:</label>
-      <input class="text-center" type="text" bind:value={cycles}>
+      <input class="text-center" placeholder="Cycles" type="text" bind:value={cycles}>
     </div>
     <label>Coin:</label>
-    <select class="text-center mb-2" bind:value={coinSelected}>
+    <select placeholder="Coins" class="text-center mb-2" bind:value={coinSelected}>
       <option value={1}>1 coins</option>
       <option value={2}>2 coins</option>
       <option value={5}>5 coins</option>
