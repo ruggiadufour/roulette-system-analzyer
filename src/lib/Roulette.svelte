@@ -1,21 +1,29 @@
 <script>
   import BetButton from './BetButton.svelte'
 
+  /* it generates the number bets () */
   let rows = Array.from({length:12},(_,i)=>i+1)
     .map((v,i)=>{
-      let arr = Array.from({length:3},(_,i)=>i+1)
+      let arr = Array.from({length:3},(_,x)=>x+1)
         return arr.reduce((acc,val)=>{
           const id = val+3*i
+          if((id-1)%3===0){
+            acc.push({
+              id: `${id}-${val+1+3*i}-${val+2+3*i}`,
+              text: `${id}-${val+1+3*i}-${val+2+3*i}`,
+              type: i%2===0?'street':'street'
+            })
+          }
           acc.push({
             id,
             text: id,
-            type:'number'
+            type:'straight'
           })
           if(id<3*(i+1)){
             acc.push({
               id: `${id}-${val+1+3*i}`,
               text: `${id}-${val+1+3*i}`,
-              type: 'between-number-2'
+              type: 'split'
             })
           }
           return acc
@@ -28,7 +36,7 @@
           val.map((v,j)=>({
             id: `${v.id}-${arr[i+1][j].id}`,
             text: `${v.id}-${arr[i+1][j].id}`,
-            type: j===1?'between-number-4':'between-number-2'
+            type: j===0?'six-line':j%2===0?'corner':'split'
           }))
         )
       }
@@ -36,97 +44,27 @@
     },[])
 
   const multipliers = {
+    straight: 35,
+    split: 15,
+    street: 11,
+    corner: 8,
+    basket: 6,
+    'six-line': 5,
     simple: 1,
     double: 2,
-    number: 35,
-    'between-number-2': 15,
-    'between-number-4': 7,
-    'zero-number': 0,
-    'zero': 0,
   }
   const reds = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]
   let coinSelected = 5
-  let balance = 10000
-  let cycles = 1000
+  let balance = 1000
+  let cycles = 1
+  let rouletteNumber = 'None'
   let showStats = false
+  let keepStats = false
   let logs = []
+  let bets = {}
   $: lostBets = logs.filter(v=>v.earn===0).length
   $: maxWin = logs.reduce((a,v)=>v.diffEarn>a ? v.diffEarn : a,0)
   $: totalBet = Object.values(bets).reduce((acc,val)=>val.bet+acc,0);
-  let bets = {
-    // "2-3": {
-    //     "id": "2-3",
-    //     "text": "2-3",
-    //     "type": "between-number-2",
-    //     "bet": 2
-    // },
-    // "11-12": {
-    //     "id": "11-12",
-    //     "text": "11-12",
-    //     "type": "between-number-2",
-    //     "bet": 2
-    // },
-    // "17-18": {
-    //     "id": "17-18",
-    //     "text": "17-18",
-    //     "type": "between-number-2",
-    //     "bet": 2
-    // },
-    // "24-27": {
-    //     "id": "24-27",
-    //     "text": "24-27",
-    //     "type": "between-number-2",
-    //     "bet": 2
-    // },
-    // "33-36": {
-    //     "id": "33-36",
-    //     "text": "33-36",
-    //     "type": "between-number-2",
-    //     "bet": 2
-    // },
-    // "29-32": {
-    //     "id": "29-32",
-    //     "text": "29-32",
-    //     "type": "between-number-2",
-    //     "bet": 2
-    // },
-    // "34-35": {
-    //     "id": "34-35",
-    //     "text": "34-35",
-    //     "type": "between-number-2",
-    //     "bet": 2
-    // },
-    // "25-26": {
-    //     "id": "25-26",
-    //     "text": "25-26",
-    //     "type": "between-number-2",
-    //     "bet": 2
-    // },
-    // "19-20": {
-    //     "id": "19-20",
-    //     "text": "19-20",
-    //     "type": "between-number-2",
-    //     "bet": 2
-    // },
-    // "13-14": {
-    //     "id": "13-14",
-    //     "text": "13-14",
-    //     "type": "between-number-2",
-    //     "bet": 2
-    // },
-    // "4-7": {
-    //     "id": "4-7",
-    //     "text": "4-7",
-    //     "type": "between-number-2",
-    //     "bet": 2
-    // },
-    // "28-31": {
-    //     "id": "28-31",
-    //     "text": "28-31",
-    //     "type": "between-number-2",
-    //     "bet": 2
-    // }
-  }
 
   const handleAddBet = ({detail})=>{
     const sid = String(detail.id)
@@ -142,7 +80,6 @@
 
   const handleSubstractBet = ({detail})=>{
     const sid = String(detail.id)
-    
     if(bets[sid].bet - coinSelected <= 0) {
       bets[sid].bet = 0
       delete bets[sid]
@@ -151,7 +88,7 @@
     }
   }
 
-  const actions = {
+  const isInRange = {
     '1_dozen':(n)=> n<=12,
     '2_dozen':(n)=> n>12 && n<=24,
     '3_dozen':(n)=> n>24 && n<=36,
@@ -167,41 +104,52 @@
   }
   
   const calculation = ()=>{
-    const rouletteNumber = parseInt(Math.random()*36)
-    // const n = 8
+    rouletteNumber = '00'//parseInt(Math.random()*37)
+    if(rouletteNumber===37){
+      rouletteNumber = '00'
+    }
     balance-=totalBet
 
     const betsArr = Object.entries(bets)
     const earn = betsArr.reduce((acc,[k,v])=>{
       const calc = (b)=> (b ? v.bet*multipliers[v.type]+v.bet : 0) + acc
       switch (v.type){
-        case 'zero':
-          return 0 + acc
-        case 'number':
+        case 'straight':
           return calc(rouletteNumber===v.id)
-        case 'between-number-4':
-          return calc(v.id.split('-').includes(String(rouletteNumber)))
-        case 'between-number-2':
+        case 'split':
+        case 'street':
+        case 'corner':
+        case 'basket':
+        case 'six-line':
           return calc(v.id.split('-').includes(String(rouletteNumber)))
         default:
-          return calc(actions[k](rouletteNumber))
+          return calc(isInRange[k](rouletteNumber))
       }
     },0)
     balance+=earn
-    logs.push({rouletteNumber, earn, diffEarn: earn-totalBet})
+    logs = [...logs, {rouletteNumber, earn, diffEarn: earn-totalBet}]
   }
 
 
 
   const handleCalculate = ()=>{
-    logs = []
+    if(!keepStats) {
+      logs = []
+    }
     for(let i = 0;i <cycles; i++) {
       calculation()
     }
     console.log(logs)
   }
 
-  const zeroEdge = ['0-1','0-2','0-3']
+  const zeroEdge = [
+    {id: '0-00-1-2-3', type:'basket'},
+    {id: '0-1', type:'split'},
+    {id: '0-1-2', type:'street'},
+    {id: '0-1-2', type:'disabled'},
+    {id: '00-2-3', type:'street'},
+    {id: '00-3', type:'split'},
+  ]
   const dozenCols = ['1_dozen_col','2_dozen_col','3_dozen_col']
 </script>
 <div class="roulette max-w-[500px]">
@@ -211,7 +159,7 @@
     <label>Cycles:</label>
     <input class="text-center mb-2" type="text" bind:value={cycles}>
     <label>Coin:</label>
-    <select class="text-center mb-6" bind:value={coinSelected}>
+    <select class="text-center mb-2" bind:value={coinSelected}>
       <option value={1}>1</option>
       <option value={2}>2</option>
       <option value={5}>5</option>
@@ -220,15 +168,20 @@
       <option value={50}>50</option>
       <option value={100}>100</option>
     </select>
+    <div class="flex items-center justify-center gap-2 mb-2">
+      <label for="keep-stats">Keep stats:</label>
+      <input id="keep-stats" type="checkbox" bind:checked={keepStats}>
+    </div>
     <button class="mb-2" on:click={()=>bets={}}>
-    Clear bets
+      Clear bets
     </button>
     <button on:click={handleCalculate}>
-    Calculate
+      Start
     </button>
-    <span class="mb-10 mt-5 font-bold bg-red-500">Bet: {totalBet}</span>
+    <span class="mb-2 mt-5 font-bold bg-green-500">Total bet: {totalBet}</span>
+    <span class="mb-10 mt-5 font-bold bg-red-500">Last number: {rouletteNumber}</span>
   </div>
-  <div class="grid grid-cols-[100px_auto] gap-[10px] mb-10">
+  <div class="grid grid-cols-[100px_auto]  mb-10">
     <div class='mt-[50px] mb-[50px] gap-[10px] flex flex-col justify-evenly items-center'>
       <div class="w-full h-full flex justify-center gap-[10px]">
         <div class="w-full flex gap-[10px] flex-col justify-center items-center">
@@ -325,24 +278,35 @@
         />
       </div>
     </div>
-    <div>
+    <div class="">
       <!-- zero -->
-      <BetButton
-        id="0"
-        text="0"
-        type="zero"
-        bets={bets[0]?.bet||0}
-        on:handleSubstractBet={handleSubstractBet}
-        on:handleAddBet={handleAddBet}
-        class="w-full"
-      />
-      <div class='flex'>
-        {#each zeroEdge as id}
+      <div class="flex gap-[10px]">
+        <BetButton
+          id="0"
+          text="0"
+          type="straight"
+          bets={bets[0]?.bet||0}
+          on:handleSubstractBet={handleSubstractBet}
+          on:handleAddBet={handleAddBet}
+          class="w-full ml-[10px]"
+        />
+        <BetButton
+          id="00"
+          text="00"
+          type="straight"
+          bets={bets['00']?.bet||0}
+          on:handleSubstractBet={handleSubstractBet}
+          on:handleAddBet={handleAddBet}
+          class="w-full"
+        />
+      </div>
+      <div class='grid grid-cols-[10px_auto_10px_auto_10px_auto]'>
+        {#each zeroEdge as edge}
           <BetButton
-            id={id}
+            id={edge.id}
             text="0"
-            type="zero-number"
-            bets={bets[id]?.bet||0}
+            type={edge.type}
+            bets={bets[edge.id]?.bet||0}
             on:handleSubstractBet={handleSubstractBet}
             on:handleAddBet={handleAddBet}  
           />
@@ -350,7 +314,7 @@
       </div>
         
       <!-- 36 numbers -->
-      <div class="numbers-wrapper grid grid-cols-[auto_10px_auto_10px_auto]">
+      <div class="numbers-wrapper grid grid-cols-[10px_auto_10px_auto_10px_auto]">
       {#each rows as row}
         {#each row as el}
           <BetButton
@@ -365,7 +329,7 @@
       </div>
 
       <!-- dozen cols -->
-      <div class='flex gap-[10px] mt-[10px]'>
+      <div class='flex gap-[10px] mt-[10px] ml-[10px]'>
         {#each dozenCols as id}
           <BetButton
             id={id}
@@ -393,7 +357,9 @@
         <div class="flex flex-col">
           <span>
             <span class="font-bold">System efficiency:</span>
-            <span> {((cycles-lostBets)/cycles*100).toFixed(2)}% ({cycles-lostBets}/{cycles}) </span>
+            <span> 
+              {((logs.length-lostBets)/logs.length*100).toFixed(2)}% ({logs.length-lostBets}/{logs.length})
+            </span>
           </span>
           <span>
             <span class="font-bold">Max win:</span>
@@ -401,7 +367,7 @@
           </span>
           <span>
             <span class="font-bold">Cycles to recover lost:</span>
-            <span> {totalBet/maxWin} </span>
+            <span> {(totalBet/maxWin).toFixed(2)} </span>
           </span>
         </div>
       {/if}

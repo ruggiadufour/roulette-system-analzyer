@@ -107,4 +107,5 @@ button:focus-visible {
   button:nth-last-of-type(n + 19),
 .roulette:has(.id-1_to_18:hover) .numbers-wrapper button:nth-of-type(n + 19) {
   opacity: 0.1;
+  transition: opacity 0.5s;
 }
