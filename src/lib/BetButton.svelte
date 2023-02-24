@@ -5,20 +5,19 @@
   let clazz;
   export { clazz as class };
   const betweens = ['split','street','corner','basket','six-line']
+  let style = null
   $: classColor = color === 'red' ? 'bg-red-500' : `bg-${color}`
 
   const handleAddBet = (id)=> dispatch('handleAddBet',{id,text,type})
   const handleSubstractBet = (id)=> dispatch('handleSubstractBet',{id,text,type})
 
-  let style = null
 
   const handleMouseOver = () => {
     style = document.createElement('style');
     style.type = 'text/css';
     const classes = id.split('-').map((i)=>`.id-${i}`).join(', ')
-    console.log(classes,id)
     style.innerHTML = `
-      .numbers-wrapper button:not(${classes}){
+      .bet-number:not(${classes}){
         opacity: .3;
         transition: opacity .5s;
       } 
@@ -53,7 +52,7 @@
   </div>
 {:else}
   <button 
-    class={`relative cursor-pointer w-[40px] h-[40px] ${classColor} text-black flex items-center justify-center ${clazz || ''} text-${color!=='white'?'white':'black'} id-${type==='number'?`number-${id}`:id}`}
+    class={`bet-number relative cursor-pointer w-[40px] h-[40px] ${classColor} text-black flex items-center justify-center ${clazz || ''} text-${color!=='white'?'white':'black'} id-${type==='number'?`number-${id}`:id}`}
     on:click={()=>handleAddBet(id)}
     on:contextmenu|preventDefault={()=>handleSubstractBet(id)}
   >
