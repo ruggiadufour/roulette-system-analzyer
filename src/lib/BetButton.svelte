@@ -1,4 +1,5 @@
 <script>
+  import BetMultiplier from './BetMultiplier.svelte'
   import { createEventDispatcher } from 'svelte'
   const dispatch = createEventDispatcher()
   export let text, id, type, bets = 0, color = 'white'
@@ -35,7 +36,7 @@
   ></div>
 {:else if betweens.includes(type)}
   <div 
-    class="relative w-full min-h-[10px] cursor-pointer"
+    class="relative group w-full min-h-[10px] cursor-pointer"
     data-testid={id}
     on:click={()=>handleAddBet(id)}
     on:contextmenu|preventDefault={()=>handleSubstractBet(id)}
@@ -49,10 +50,11 @@
         {bets}
       </span>
     {/if}
+    <BetMultiplier class="hidden group-hover:block absolute top-[100%] left-[50%] translate-x-[-50%] translate--[-50%]" type={type} />
   </div>
 {:else}
   <button 
-    class={`bet-number relative cursor-pointer w-[40px] h-[40px] ${classColor} text-black flex items-center justify-center ${clazz || ''} text-${color!=='white'?'white':'black'} id-${type==='number'?`number-${id}`:id}`}
+    class={`bet-number group relative cursor-pointer w-[40px] h-[40px] ${classColor} text-black flex items-center justify-center text-${color!=='white'?'white':'black'} id-${type==='number'?`number-${id}`:id} ${clazz || ''}`}
     data-testid={id}
     on:click={()=>handleAddBet(id)}
     on:contextmenu|preventDefault={()=>handleSubstractBet(id)}
@@ -65,5 +67,7 @@
           {bets}
         </span>
       {/if}
+
+      <BetMultiplier class="hidden group-hover:block absolute bottom-[-20px]" type={type} />
   </button>
 {/if}
