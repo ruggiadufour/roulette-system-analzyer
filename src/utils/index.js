@@ -55,3 +55,6 @@ export function generateBetNumbers(ROWS = 12, COLS = 3) {
       return acc;
     }, []);
 }
+
+export const getNumberCol = (n) => ((n - 1) % 3) + 1;
+export const getNumberRow = (n) => (n <= 12 ? 1 : n <= 24 ? 2 : 3);

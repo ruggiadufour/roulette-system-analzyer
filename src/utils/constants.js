@@ -23,3 +23,18 @@ export const multipliers_enum = {
 export const reds = [
   1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36,
 ];
+
+export const sideBetIds = [
+  '1_dozen',
+  '2_dozen',
+  '3_dozen',
+  '1_dozen_col',
+  '2_dozen_col',
+  '3_dozen_col',
+  '19_to_36',
+  '1_to_18',
+  'odd',
+  'even',
+  'black',
+  'red',
+];

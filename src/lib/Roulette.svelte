@@ -150,11 +150,6 @@
     <span class="mt-5 font-bold bg-blue-500">Total bet: {totalBet}</span>
     <span class="mb-5 mt-5 font-bold bg-red-500">Last number: {rouletteNumber}</span>
     <span class="mb-10 font-bold bg-green-500">Last gain: {lastGain}</span>
-    <span class="mb-10 font-bold bg-green-500">
-      {#each Object.values(bets) as b}
-        {b.id}
-      {/each}
-    </span>
   </div>
   <div class="grid grid-cols-[100px_auto]  mb-10">
     <div class='mt-[50px] mb-[50px] gap-[10px] flex flex-col justify-evenly items-center'>
