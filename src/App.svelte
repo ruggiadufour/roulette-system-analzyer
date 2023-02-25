@@ -1,10 +1,10 @@
 <script>
-  import svelteLogo from './assets/svelte.svg'
-  import Roulette from './lib/Roulette.svelte'
-  import './tailwind.css'
+  import svelteLogo from './assets/svelte.svg';
+  import RouletteGame from './lib/RouletteGame.svelte';
+  import './tailwind.css';
 </script>
 
-<Roulette/>
+<RouletteGame />
 
 <style>
   .logo {

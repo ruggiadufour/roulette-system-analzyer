@@ -1,12 +1,16 @@
 <script>
-  import { multipliers } from '../utils/constants.js'
-  export let type
+  import { multipliers } from '../utils/constants.js';
+  export let type;
   let clazz;
   export { clazz as class };
 </script>
 
-<div class={`bet-multiplier bg-blue-500 z-10 px-[2px] rounded-[5px] text-white ${clazz}`}>
-  <div class="triangle bg-blue-500 absolute top-[-11px] left-[50%] translate-x-[-50%]  w-3 h-3"></div>
+<div
+  class={`bet-multiplier z-10 rounded-[5px] bg-blue-500 px-[2px] text-white ${clazz}`}
+>
+  <div
+    class="triangle absolute top-[-11px] left-[50%] h-3 w-3  translate-x-[-50%] bg-blue-500"
+  />
   {multipliers[type]}:1
 </div>
 

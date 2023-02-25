@@ -20,6 +20,8 @@ export const multipliers_enum = {
   DOUBLE: 2,
 };
 
+export const coins = [1, 2, 5, 10, 20, 50, 100];
+
 export const reds = [
   1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36,
 ];
