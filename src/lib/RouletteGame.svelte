@@ -27,9 +27,9 @@
 		if (!bets[sid]?.bet) {
 			bets[sid] = detail;
 			bets[sid].bet = coinSelected;
+		} else {
 			bets[sid].bet += coinSelected;
 		}
-		console.log(bets);
 	};
 
 	const handleSubstractBet = ({ detail }: { detail: betModel }) => {

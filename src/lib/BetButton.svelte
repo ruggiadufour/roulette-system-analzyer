@@ -10,7 +10,7 @@
 		color = 'white';
 	let clazz = '';
 	export { clazz as class };
-	const betweens: multiplierTypes[] = ['SPLIT', 'STREET', 'CORNER', 'BASKET', 'SIXLINE'];
+	const betweens: multiplierTypes[] = ['SPLIT', 'STREET', 'CORNER', 'BASKET', 'SIXLINE',];
 	let style: HTMLStyleElement | null = null;
 	$: classColor = color === 'red' ? 'bg-red-500' : `bg-${color}`;
 
