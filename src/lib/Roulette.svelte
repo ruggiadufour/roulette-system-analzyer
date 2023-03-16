@@ -1,27 +1,27 @@
-<script>
-  import { Canvas, InteractiveObject, OrbitControls, T } from '@threlte/core';
-  import { spring } from 'svelte/motion';
-  import { degToRad } from 'three/src/math/MathUtils';
+<script lang="ts">
+  import { Object3DInstance, Mesh } from '@threlte/core'
+  import { useGltf } from '@threlte/extras'
+  import { MeshBasicMaterial } from 'three'
 
-  const scale = spring(1);
+  const { gltf } = useGltf('../assets/3dmodels/roulette.glb')
 </script>
 
-<Canvas>
-  <T.PerspectiveCamera makeDefault position={[10, 10, 10]} fov={25}>
-    <OrbitControls
-      maxPolarAngle={degToRad(80)}
-      enableZoom={true}
-      target={{ y: 0.5 }}
-    />
-  </T.PerspectiveCamera>
 
-  <T.DirectionalLight castShadow position={[3, 10, 10]} />
-  <T.DirectionalLight position={[-3, 10, -10]} intensity={0.2} />
-  <T.AmbientLight intensity={0.2} />
+{#if $gltf}
+  if gltf
+{/if}
 
-  <!-- Floor -->
-  <T.Mesh receiveShadow rotation.x={degToRad(-90)}>
-    <T.CircleGeometry args={[3, 20]} />
-    <T.MeshStandardMaterial color="black" />
-  </T.Mesh>
-</Canvas>
+{#if !$gltf}
+    {$gltf}
+ no gltf
+{/if}
+
+<!-- Use an object node entirely -->
+{#if $gltf}
+  <Object3DInstance object={$gltf.nodes['node-name']} />
+{/if}
+
+<!-- or only the geometry -->
+<!-- {#if $gltf}
+  <Mesh geometry={$gltf.nodes['node-name'].geometry} material={new MeshBasicMaterial()} />
+{/if} -->
