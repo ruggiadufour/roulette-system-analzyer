@@ -48,5 +48,8 @@
 		"vite": "^4.0.0",
 		"vitest": "^0.25.8"
 	},
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"@sveltejs/adapter-vercel": "^2.1.1"
+	}
 }
