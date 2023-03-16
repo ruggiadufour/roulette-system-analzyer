@@ -3,7 +3,7 @@
   import { useGltf } from '@threlte/extras'
   import { MeshBasicMaterial } from 'three'
 
-  const { gltf } = useGltf('../assets/3dmodels/roulette.glb')
+  const { gltf } = useGltf('https://thinkuldeep.com/modelviewer/Astronaut.glb')
 </script>
 
 
@@ -20,6 +20,7 @@
 {#if $gltf}
   <Object3DInstance object={$gltf.nodes['node-name']} />
 {/if}
+
 
 <!-- or only the geometry -->
 <!-- {#if $gltf}
