@@ -8,10 +8,12 @@
 	import { Canvas } from '@threlte/core';
 	import { HTML } from '@threlte/extras';
 	import { World } from '@threlte/rapier';
+
 	const { gltf } = useGltf('/src/assets/3dmodels/roulette.glb');
-	const helmet = derived(gltf, (gltf) => {
-		if (!gltf || !gltf.nodes['Mesh_Mesh_head_geo001_lambert2SG001']) return;
-		return gltf.nodes['Mesh_Mesh_head_geo001_lambert2SG001'];
+	const roulette = derived(gltf, (gltf) => {
+        const nodeKey = 'Mesh_Mesh_head_geo001_lambert2SG001'
+		if (!gltf || !gltf.nodes[nodeKey]) return;
+		return gltf.nodes[nodeKey];
 	});
 </script>
 
@@ -23,23 +25,14 @@
 
 		<DirectionalLight shadow position={{ y: 20, x: 8, z: -3 }} />
 
-		{#if $gltf}
-			{$gltf.nodes['Mesh_Mesh_head_geo001_lambert2SG001']}
-		{/if}
-
-		{#if $helmet}
-			if helmet
-			{$helmet.material}
-		{/if}
-
-		{#if $helmet}
+		{#if $roulette}
 			<RigidBody
-				position={{ x: -30, y: 0, z: -25 }}
+				position={{ x: -30, y: 0, z: -24 }}
 				rotation={{
 					x: 270 * DEG2RAD
 				}}
 			>
-				<Mesh castShadow geometry={$helmet.geometry} material={$helmet.material} />
+				<Mesh castShadow geometry={$roulette.geometry} material={$roulette.material} />
 			</RigidBody>
 		{/if}
 
